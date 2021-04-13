@@ -7,5 +7,5 @@ const port = process.env.PORT || 4000
 
 app.listen(port, async () => {
     await InitConnection()
-    console.log('app started on POrt ', PORT);
+    console.log('app started on POrt ', port);
 })
