@@ -9,7 +9,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    connection.destroy
+    await query('DROP TABLE Transactions')
+    await connection.end()
 })
 
 describe('All tables should be created', () => {
