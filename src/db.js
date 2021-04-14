@@ -1,7 +1,8 @@
 // get the client
 const mysql = require('mysql2');
 const fs = require('fs')
-const { promisify } = require('util')
+const { promisify } = require('util');
+const { log } = require('./utils');
 
 // Create the connection pool. The pool-specific settings are the defaults
 const connection = mysql.createPool({
@@ -18,6 +19,7 @@ const InitConnection = async () => {
   try {
     const data = await fs.readFileSync('./init.sql', 'utf-8');
     connection.query(data, (err, result) => {
+      log(err)
       if(!err){
         console.log('synced database')
       }

@@ -21,3 +21,8 @@ module.exports.deleteOne = async (req, res) => {
 module.exports.updateOne = async (req, res) => {
     return _ts.updateUserTransactions(req, res);
 }
+
+//get unique likes and people 
+module.exports.getSimilarUsers = async (req, res) => {
+    return _ts.getSimilarUsers(req, res);
+}

@@ -103,6 +103,73 @@ class TransactionsService {
             return response(res, 500, false, {}, 'server Error')
         }
     }
+
+    async getSimilarUsers(req, res) {
+        const id = req.params.id;
+        if (!id) {
+            return response(res, 400, false, {}, 'user id is required');
+        }
+        if (!req.body.trend) {
+            return response(res, 400, false, {}, 'trend is required');
+        }
+        const trends = req.body.trend
+        const details = []
+        const uniquepattern = (id, category) => {
+            return `
+            SELECT
+                count(*) c,
+                t.userId,
+                t.category,
+                u.first_name ,
+                u.last_name ,
+                u.id
+            from
+                Transactions t left join Users u on t.userId = u.id
+            WHERE t.category = '${category}' and t.date_time >= DATE_SUB(NOW(),INTERVAL 1 YEAR) and userId  != ${id}
+            group by
+            t.category ,
+            MONTHNAME(t.date_time),
+            t.userId
+        `
+        }
+        // array of user number of transactions and first_name , last_name
+        let result = []
+
+        for (const trend of trends) {
+            const q = uniquepattern(id, trend)
+            const y = await query(q)
+            details.push(y)
+        }
+
+        details.forEach((h) => {
+            const tttt = Object.values(h.reduce((r, e) => {
+                let k = `${e.userId}|${e.c}`;
+                if (!r[k]) r[k] = { ...e, count: 1 }
+                else {
+                    r[k].count += 1
+                };
+                return r;
+            }, {}))
+            log(result)
+            //select transactions that occurs more than 5 months
+            result.push(tttt.filter(e => e.count > 5))
+            h.forEach(g => {
+                let x = result.findIndex(f => {
+                    return f.userId === g.userId
+                })
+                if (x > -1) {
+                    result[x] = {
+                        c: +g.c + +result[x].c,
+                        userId: 6,
+                        first_name: result[x].first_name,
+                        last_name: result[x].last_name,
+                    }
+                }
+            })
+        })
+        return response(res, 200, true, result.flat() , 'success')
+
+    }
 }
 
 module.exports = TransactionsService
