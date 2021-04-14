@@ -169,6 +169,21 @@ class TransactionsService {
             //     }
             // })
         })
+
+        // result = result.flat().filter(e => {
+        //     e.id !== id
+        // })
+
+        result = Object.values(result.flat().reduce((r, e) => {
+            let k = `${e.userId}`;
+            if (!r[k]) r[k] = { ...e, count: 1 }
+            else {
+                r[k].count += 1
+                r[k].c += e.c
+            };
+            return r;
+        }, {}))
+
         return response(res, 200, true, result.flat() , 'success')
 
     }
