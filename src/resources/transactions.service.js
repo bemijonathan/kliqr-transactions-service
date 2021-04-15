@@ -123,6 +123,7 @@ class TransactionsService {
                 u.first_name ,
                 u.last_name ,
                 u.id,
+                u.avatar,
                 u.created_at
             from
                 Transactions t left join Users u on t.userId = u.id
