@@ -209,20 +209,24 @@ class TransactionsService {
 		//get number transactions of each of the users
 
 		const userIds = result.flat().map((e) => e.id);
-		const transactions = await query(`select userId, count(id) as count
-        from Transactions 
-        where userId in (${[...userIds]})
-        group by userId `);
 
-        result = result.map(e => {
-            let t = transactions.find(g => {
-                if(g.userId === e.id){
-                    return g.count
-                }
-            })
-            e["transaction_count"] = t.count
-            return e
-        })
+		if (userIds.length) {
+			const transactions = await query(`select userId, count(id) as count
+                from Transactions 
+                where userId in (${[...userIds]})
+                group by userId 
+            `);
+
+			result = result.map((e) => {
+				let t = transactions.find((g) => {
+					if (g.userId === e.id) {
+						return g.count;
+					}
+				});
+				e["transaction_count"] = t.count;
+				return e;
+			});
+		}
 
 		return response(res, 200, true, result.flat(), "success");
 	}
